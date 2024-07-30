@@ -303,7 +303,7 @@ public class Controller {
 		this.textAreaChatS.setText(this.getCurrentTimestamp() + " " + this.textFieldNicknameS.getText() + " created the room");
 		
 		// create new room -> start server (if OK switch to Server Room View)
-		this.server = new ServerStream(this, this.textFieldNicknameS.getText(), Integer.parseInt(this.labelMinRoom.getText()), Integer.parseInt(this.labelMaxRoom.getText()), this.checkBoxRejoin.isSelected());
+		this.server = new ServerStream(this, this.textFieldNicknameS.getText(), 2, 2, this.checkBoxRejoin.isSelected());
 		this.client = null;
 		
 		// reset the user list

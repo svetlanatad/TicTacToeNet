@@ -22,7 +22,7 @@ public class Main extends Application{
 			stage.setScene(scene);
 			stage.setResizable(false);
 			stage.show();
-			stage.getIcons().add(new Image("ticTacToe.ico"));
+		//	stage.getIcons().add(new Image("resources/ticTacToe.ico"));
 			this.controller = (Controller) loader.getController();
 			
 		} catch(Exception e) {
