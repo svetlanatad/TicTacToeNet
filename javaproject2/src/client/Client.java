@@ -21,6 +21,9 @@ public class Client {
                         out.println(fromUser);
                     }
                 }
+                if (fromServer.contains("Game over.")) {
+                    break;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

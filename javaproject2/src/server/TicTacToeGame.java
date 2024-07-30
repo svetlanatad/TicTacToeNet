@@ -6,6 +6,7 @@ public class TicTacToeGame {
     private char[][] board;
     private char currentPlayer;
     private int playerCount;
+    private boolean gameFinished;
 
     public TicTacToeGame() {
         board = new char[3][3];
@@ -14,6 +15,7 @@ public class TicTacToeGame {
         }
         currentPlayer = 'X';
         playerCount = 0;
+        gameFinished = false;
     }
 
     public synchronized char addPlayer() {
@@ -29,6 +31,10 @@ public class TicTacToeGame {
     }
 
     public synchronized String makeMove(int row, int col, char player) {
+        if (gameFinished) {
+            return "Game is already finished.";
+        }
+
         if (player != currentPlayer) {
             return "It's not your turn.";
         }
@@ -39,10 +45,12 @@ public class TicTacToeGame {
 
         board[row][col] = currentPlayer;
         if (checkWin()) {
+            gameFinished = true;
             return "Player " + currentPlayer + " wins!\n" + getBoard();
         }
 
         if (checkDraw()) {
+            gameFinished = true;
             return "It's a draw!\n" + getBoard();
         }
 
@@ -95,6 +103,10 @@ public class TicTacToeGame {
 
     public char getCurrentPlayer() {
         return currentPlayer;
+    }
+
+    public boolean isGameFinished() {
+        return gameFinished;
     }
 }
 
