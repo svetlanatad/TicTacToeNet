@@ -28,6 +28,10 @@ public class Server {
                     // Notify players to start the game
                     for (ClientHandler handler : clientHandlers) {
                         handler.getOut().println("Game starting... You are player " + handler.getPlayerSymbol());
+                        handler.getOut().println(handler.getGame().getBoard());
+                        if (handler.getPlayerSymbol() == 'X') {
+                            handler.getOut().println("Make your move: ");
+                        }
                     }
                 }
             }

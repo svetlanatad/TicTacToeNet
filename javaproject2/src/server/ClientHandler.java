@@ -30,13 +30,13 @@ public class ClientHandler implements Runnable {
         return out;
     }
 
+    public TicTacToeGame getGame() {
+        return game;
+    }
+
     @Override
     public void run() {
         try {
-            out.println("Game starting... You are player " + playerSymbol);
-            String boardState = game.getBoard();
-            out.println(boardState);
-
             String move;
             while ((move = in.readLine()) != null) {
                 String[] moveParts = move.split(",");
@@ -46,15 +46,16 @@ public class ClientHandler implements Runnable {
                 String response = game.makeMove(row, col, playerSymbol);
                 out.println(response);
 
-                if (response.contains("wins") || response.contains("draw")) {
-                    break;
+                // Send updated board to both players
+                for (ClientHandler handler : Server.clientHandlers) {
+                    handler.getOut().println(game.getBoard());
+                    if (handler.getPlayerSymbol() == game.getCurrentPlayer()) {
+                        handler.getOut().println("Make your move: ");
+                    }
                 }
 
-                // Send updated board to the other player
-                for (ClientHandler handler : Server.clientHandlers) {
-                    if (handler != this) {
-                        handler.getOut().println(game.getBoard());
-                    }
+                if (response.contains("wins") || response.contains("draw")) {
+                    break;
                 }
             }
         } catch (IOException e) {
