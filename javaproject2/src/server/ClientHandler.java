@@ -1,6 +1,9 @@
 package server;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 public class ClientHandler implements Runnable {
@@ -10,10 +13,8 @@ public class ClientHandler implements Runnable {
     private PrintWriter out;
     private BufferedReader in;
 
-    public ClientHandler(Socket socket, TicTacToeGame game, char playerSymbol) {
+    public ClientHandler(Socket socket) {
         this.clientSocket = socket;
-        this.game = game;
-        this.playerSymbol = playerSymbol;
         try {
             this.out = new PrintWriter(clientSocket.getOutputStream(), true);
             this.in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -26,6 +27,10 @@ public class ClientHandler implements Runnable {
         return playerSymbol;
     }
 
+    public void setPlayerSymbol(char playerSymbol) {
+        this.playerSymbol = playerSymbol;
+    }
+
     public PrintWriter getOut() {
         return out;
     }
@@ -34,11 +39,23 @@ public class ClientHandler implements Runnable {
         return game;
     }
 
+    public void setGame(TicTacToeGame game) {
+        this.game = game;
+    }
+
     @Override
     public void run() {
         try {
             String move;
             while ((move = in.readLine()) != null) {
+                if (move.equalsIgnoreCase("q")) {
+                    out.println("You have quit the game.");
+
+                    Server.removePlayer(this);
+                    Server.socket.close();
+                    break;
+                }
+
                 String[] moveParts = move.split(",");
                 if (moveParts.length != 2) {
                     out.println("Invalid input format. Use row,col (e.g., 1,2).");
@@ -87,4 +104,3 @@ public class ClientHandler implements Runnable {
         }
     }
 }
-
