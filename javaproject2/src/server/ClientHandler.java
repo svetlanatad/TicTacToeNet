@@ -1,4 +1,4 @@
-package server;
+package javaproject2.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,6 +12,7 @@ public class ClientHandler implements Runnable {
     private char playerSymbol;
     private PrintWriter out;
     private BufferedReader in;
+    private GameRoom gameRoom;
 
     public ClientHandler(Socket socket) {
         this.clientSocket = socket;
@@ -23,24 +24,24 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    public char getPlayerSymbol() {
-        return playerSymbol;
+    public void setGame(TicTacToeGame game) {
+        this.game = game;
     }
 
     public void setPlayerSymbol(char playerSymbol) {
         this.playerSymbol = playerSymbol;
     }
 
+    public void setGameRoom(GameRoom gameRoom) {
+        this.gameRoom = gameRoom;
+    }
+
+    public char getPlayerSymbol() {
+        return playerSymbol;
+    }
+
     public PrintWriter getOut() {
         return out;
-    }
-
-    public TicTacToeGame getGame() {
-        return game;
-    }
-
-    public void setGame(TicTacToeGame game) {
-        this.game = game;
     }
 
     @Override
@@ -48,11 +49,9 @@ public class ClientHandler implements Runnable {
         try {
             String move;
             while ((move = in.readLine()) != null) {
+
                 if (move.equalsIgnoreCase("q")) {
                     out.println("You have quit the game.");
-
-                    Server.removePlayer(this);
-                    Server.socket.close();
                     break;
                 }
 
@@ -71,25 +70,25 @@ public class ClientHandler implements Runnable {
                     continue;
                 }
 
-                String response = game.makeMove(row, col, playerSymbol);
+                synchronized (game) {
+                    String response = game.makeMove(row, col, playerSymbol);
 
-                if (response.equals("It's not your turn.") || response.equals("Invalid move, try again.") || response.equals("Game is already finished.")) {
-                    out.println(response);
-                } else {
-                    // Send updated board to both players
-                    for (ClientHandler handler : Server.clientHandlers) {
-                        handler.getOut().println(response);
+                    if (response.equals("It's not your turn.") || response.equals("Invalid move, try again.") || response.equals("Game is already finished.")) {
+                        out.println(response);
+                    } else {
+                        // Send updated board to both players
+                        gameRoom.broadcast(response);
                         if (game.isGameFinished()) {
-                            handler.getOut().println("Game over. " + response);
-                            handler.clientSocket.close();
-                        } else if (handler.getPlayerSymbol() == game.getCurrentPlayer()) {
-                            handler.getOut().println("Make your move: ");
+                            gameRoom.broadcast("Game over. " + response);
+                            clientSocket.close();
+                            break;
+                        } else {
+                            for (ClientHandler handler : gameRoom.getPlayers()) {
+                                if (handler.getPlayerSymbol() == game.getCurrentPlayer()) {
+                                    handler.getOut().println("Make your move: ");
+                                }
+                            }
                         }
-                    }
-
-                    if (game.isGameFinished()) {
-                        Server.clientHandlers.clear();
-                        break;
                     }
                 }
             }
@@ -100,6 +99,10 @@ public class ClientHandler implements Runnable {
                 clientSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+            Server.removeClient(this);
+            if (gameRoom != null) {
+                gameRoom.removePlayer(this);
             }
         }
     }

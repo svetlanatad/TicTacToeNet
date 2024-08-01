@@ -1,4 +1,4 @@
-package client;
+package javaproject2.client;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -30,4 +30,3 @@ public class Client {
         }
     }
 }
-

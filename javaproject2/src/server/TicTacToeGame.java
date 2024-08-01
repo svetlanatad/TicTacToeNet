@@ -1,4 +1,4 @@
-package server;
+package javaproject2.server;
 
 import java.util.Arrays;
 
@@ -18,7 +18,7 @@ public class TicTacToeGame {
         gameFinished = false;
     }
 
-    public synchronized char addPlayer() {
+    public char addPlayer() {
         if (playerCount == 0) {
             playerCount++;
             return 'X';
@@ -30,7 +30,7 @@ public class TicTacToeGame {
         }
     }
 
-    public synchronized String makeMove(int row, int col, char player) {
+    public String makeMove(int row, int col, char player) {
         if (gameFinished) {
             return "Game is already finished.";
         }
@@ -58,7 +58,7 @@ public class TicTacToeGame {
         return getBoard();
     }
 
-    public synchronized String getBoard() {
+    public String getBoard() {
         StringBuilder sb = new StringBuilder();
         for (char[] row : board) {
             for (char cell : row) {
