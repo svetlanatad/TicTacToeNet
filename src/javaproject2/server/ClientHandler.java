@@ -48,7 +48,8 @@ public class ClientHandler implements Runnable {
     public void run() {
         try {
             String move;
-            while ((move = in.readLine()) != null) {
+            while (true) {
+                move = in.readLine();
 
                 if (move.equalsIgnoreCase("q")) {
                     out.println("You have quit the game.");
@@ -58,6 +59,11 @@ public class ClientHandler implements Runnable {
                 String[] moveParts = move.split(",");
                 if (moveParts.length != 2) {
                     out.println("Invalid input format. Use row,col (e.g., 1,2).");
+                    for (ClientHandler handler : gameRoom.getPlayers()) {
+                        if (handler.getPlayerSymbol() == game.getCurrentPlayer()) {
+                            handler.getOut().println("Make your move: ");
+                        }
+                    }
                     continue;
                 }
 
@@ -67,6 +73,11 @@ public class ClientHandler implements Runnable {
                     col = Integer.parseInt(moveParts[1].trim()) - 1;
                 } catch (NumberFormatException e) {
                     out.println("Invalid input format. Use row,col (e.g., 1,2).");
+                    for (ClientHandler handler : gameRoom.getPlayers()) {
+                        if (handler.getPlayerSymbol() == game.getCurrentPlayer()) {
+                            handler.getOut().println("Make your move: ");
+                        }
+                    }
                     continue;
                 }
 
